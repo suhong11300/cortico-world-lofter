@@ -8,6 +8,7 @@
  */
 import { chmodSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { cleanText } from './types.ts';
 
 /** 存储格式版本。 */
 export const LOFTER_SESSION_VERSION = 1;
@@ -55,7 +56,8 @@ export function readSession(dataDir: string): LofterSession {
     version: LOFTER_SESSION_VERSION,
     cookie: text('cookie'),
     updatedAt: text('updatedAt'),
-    nickname: text('nickname'),
+    // 昵称来自上游响应,会进环境前缀与面板;先洗控制字符再限长,别把别人的排版带进来。
+    nickname: cleanText(text('nickname'), 40),
     scriptSessionId: text('scriptSessionId'),
     httpSessionId: text('httpSessionId'),
   };
