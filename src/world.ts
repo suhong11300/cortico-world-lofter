@@ -854,9 +854,11 @@ export class LofterWorld implements World {
       throw new Error('图太大(' + Math.round(buffer.byteLength / 1048576) + 'MB,上限 ' + limitMb + 'MB)');
     }
     let name = basename(target.pathname);
-    if (name === '' || name === '/') name = 'image';
     if (extname(name) === '') name = name + '.jpg';
     name = name.replace(/[\\/:*?"<>|]/g, '_');
+    // 路径段可能被构造成 "." 或 "..",那样 join(dir, name) 就跳出下载目录:去掉首尾的点与空白。
+    name = name.replace(/^[.\s]+/, '').replace(/[.\s]+$/, '');
+    if (name === '' || name === 'jpg') name = 'image.jpg';
     let dest = join(dir, name);
     let index = 1;
     while (existsSync(dest)) {

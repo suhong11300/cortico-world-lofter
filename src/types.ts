@@ -43,6 +43,22 @@ function asText(value: unknown): string {
   return '';
 }
 
+/**
+ * 去掉控制字符与零宽字符,保留换行与制表(正文的段落结构有用)。
+ *
+ * 帖子标题、博主昵称、正文都是别人可写的内容:零宽字符能在回执里藏一段看不见的指令,
+ * 控制字符能打乱排版,超长正文会撑爆输入预算。所以进模型之前先洗一遍。
+ */
+export function stripControl(value: string): string {
+  return value.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\u200b-\u200f\u2028\u2029\ufeff]/g, ' ');
+}
+
+/** 洗一遍再压平空白与限长,给标题、昵称、摘要这类单行字段用。 */
+export function cleanText(value: string, maxLength: number): string {
+  const flat = stripControl(value).replace(/\s+/g, ' ').trim();
+  return flat.length > maxLength ? flat.slice(0, maxLength) : flat;
+}
+
 function asNumber(value: unknown): number {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
   if (typeof value === 'string' && value.trim() !== '' && Number.isFinite(Number(value))) return Number(value);
@@ -145,8 +161,8 @@ export function normalizePost(raw: unknown): LofterPostSummary | undefined {
   const postId = asText(pick(record, ['postId', 'permalink', 'id', 'postid']));
   if (postId === '') return undefined;
   const blogId = asText(pick(record, ['blogId', 'blogid', 'domainName', 'blogDomain']));
-  const title = asText(pick(record, ['title', 'postTitle', 'name'])).trim();
-  const blogName = asText(pick(record, ['blogName', 'nickName', 'nickname', 'authorName'])).trim();
+  const title = cleanText(asText(pick(record, ['title', 'postTitle', 'name'])), 120);
+  const blogName = cleanText(asText(pick(record, ['blogName', 'nickName', 'nickname', 'authorName'])), 60);
   const excerptRaw = pick(record, ['digest', 'summary', 'excerpt', 'recommend', 'describe']);
   // 真机对象带 blogPageUrl,是拼好的完整地址,比自己拼可靠
   const pageUrl = asText(pick(record, ['blogPageUrl', 'pageUrl'])).trim();
@@ -156,7 +172,7 @@ export function normalizePost(raw: unknown): LofterPostSummary | undefined {
     blogId,
     blogName,
     publishAt: normalizeTime(pick(record, ['publishTime', 'publishDate', 'time', 'postTime', 'date'])),
-    excerpt: htmlToText(asText(excerptRaw)).slice(0, 240),
+    excerpt: cleanText(htmlToText(asText(excerptRaw)), 240),
     likeCount: asNumber(pick(record, ['likeCount', 'likeNum', 'favoriteCount', 'favCount'])),
     commentCount: asNumber(pick(record, ['commentCount', 'commentNum', 'replyCount'])),
     // blogName 有时是域名(road11)、有时是昵称(中文),只有像域名时才拿它拼地址
@@ -173,7 +189,7 @@ export function normalizePostDetail(raw: unknown, maxChars: number, maxImages: n
   const summary = normalizePost(raw);
   if (!summary) return undefined;
   const record = raw as Record<string, unknown>;
-  const full = htmlToText(asText(pick(record, ['content', 'body', 'text', 'contentRaw', 'postContent'])));
+  const full = stripControl(htmlToText(asText(pick(record, ['content', 'body', 'text', 'contentRaw', 'postContent']))));
   const truncated = full.length > maxChars;
   const images = collectImages(
     pick(record, ['images', 'imgs', 'photoLinks', 'imageList', 'photos', 'imgList']),

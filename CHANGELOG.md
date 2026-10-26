@@ -1,3 +1,10 @@
+## 0.1.3
+
+安全 review 的两处收紧：
+
+- 帖子标题、博主昵称、摘要与正文进回执前先洗一遍：去掉控制字符与零宽字符（零宽字符能在回执里藏看不见的指令），标题/昵称/摘要压平空白并限长（120 / 60 / 240），正文保留换行但同样清洗。
+- 存图文件名兜底：路径段被构造成 `.` 或 `..` 时不再拼到下载目录之外，首尾的点与空白会去掉，清洗后为空则退回 `image.jpg`。
+- 测试仍是 141 项（新增用例沿用原有断言，未改语义）。
 ## 0.1.2
 
 简介改为正式说明体：先一句定位，再用分号分列能力与边界，去掉口语化措辞与第二人称。
@@ -16,7 +23,7 @@
 
 首个版本：**只读**。用本机存的 Cookie 复刻站点自己的请求，把博文与配图带回对话。
 
-### 能读什么（2026-10-27 用真实 Cookie 定案）
+### 能读什么（2026-10-26 用真实 Cookie 定案）
 
 - **九个工具**：`lofter_login_status` / `lofter_login_cookie` / `lofter_blog_posts` / `lofter_tag_posts` / `lofter_search` / `lofter_post` / `lofter_hot_posts` / `lofter_download` / `lofter_watch`。
 - **只有两个 DWR 方法能出数**：`PostBean.getHotPosts(number,number)`（10 篇，每篇的 `content` 就是全文，143 KB 一次拿完）与 `TagBean.getRandomRTPostList()`（首页推荐位）。其余方法要么签名对不上，要么进 DAO 就抛 `DBSupportRuntimeException`。

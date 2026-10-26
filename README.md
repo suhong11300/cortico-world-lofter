@@ -244,7 +244,7 @@ curl -s "http://127.0.0.1:<web 端口>/api/prompts/prefix"
 | 静态 | `tsc --noEmit` 干净；`vitest run` **138 项**全绿（`dwr` 18 + `html` 19 + `types` 22 + `session` 14 + `world` 33 + `adaptive` 16 + `security` 16） | 编解码、HTML 解析、字段归一、登录态存取、门禁与渲染自洽 | 站点接受这些请求 |
 | 契约 | `describe.json` 由 `exportDescribe` 生成、`checkDescribe` 三项全 ok、0 warning | 包形状合 Cortico 规范 | 行为与观感 |
 | 面板 | `node scripts/build-webui.mjs` 产出 `dist/webui.js` 4.3 KB | 浏览器产物能构建 | 面板在真宿主的渲染 |
-| 运行时 | 2026-10-27 用真实 Cookie 跑通三条：热门 11 篇带全文、博主首屏 10 条链接、单篇正文与配图 | 请求四件套被站点接受、字段名对得上 | 宿主内面板交互未复测 |
+| 运行时 | 2026-10-26 用真实 Cookie 跑通三条：热门 11 篇带全文、博主首屏 10 条链接、单篇正文与配图 | 请求四件套被站点接受、字段名对得上 | 宿主内面板交互未复测 |
 
 ```bash
 corepack pnpm install
@@ -284,7 +284,7 @@ Cookie 的处置:只落 `<data>/lofter/session.json`(原子写 + `0600`),不进 
 
 ## 已知边界
 
-- **站点只有两个能出数的 DWR 方法。** 2026-10-27 用真实 Cookie 逐条试过：`PostBean.getHotPosts(number,number)` 能出数（10 篇，每篇的 `content` 就是全文），`TagBean.getRandomRTPostList()` 能出首页推荐位。其余方法要么签名对不上（三错合一，见下条），要么进 DAO 就抛 `DBSupportRuntimeException`。所以列表能力只有「站内热门」，博主维度改走 HTML。
+- **站点只有两个能出数的 DWR 方法。** 2026-10-26 用真实 Cookie 逐条试过：`PostBean.getHotPosts(number,number)` 能出数（10 篇，每篇的 `content` 就是全文），`TagBean.getRandomRTPostList()` 能出首页推荐位。其余方法要么签名对不上（三错合一，见下条），要么进 DAO 就抛 `DBSupportRuntimeException`。所以列表能力只有「站内热门」，博主维度改走 HTML。
 - **HTML 通道才是主力。** 单篇 `https://<blog>.lofter.com/post/<permalink>` 与博主首屏 `https://<blog>.lofter.com/` 都能直接 GET（带 Cookie）。permalink 形状是 `<8位hex>_<9位hex>`，纯数字拼 URL 一律 404 —— `lofter_post` 收到错形状时会回这句提示。
 - **标签流与站内搜索确认不通。** `SearchBean` 连同 `SearchV2Bean` / `Search2Bean` / `BlogSearchBean` / `PostSearchBean` / `TagSearchBean` / `FindBean` / `QueryBean` 等二十多个候选名全回 `No class by name`（该 Bean 不存在）；标签维度能拿到的只有推荐位，不是按标签分页。这两个工具会直接说明并给替代路径，不会假装搜过。
 - **`IllegalArgumentException` 是三错合一。** 「方法不存在 / 实参签名不对 / 缺 DWR 会话字段」回的是同一段 139 字节错误，无法区分，所以候选签名只能逐组试。命中后写进进程内的 `signatures`，下次先试它。校准入口集中在 `src/world.ts` 的 `DWR_ENDPOINTS`，改一张表即可。
