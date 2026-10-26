@@ -13,6 +13,8 @@
 
 *Cortico World · `kind: world` · `api: 6` · `tags: external-setup / experimental` · MIT · 静态与单测已过、宿主内交互未复测*
 
+[源码](https://github.com/suhong11300/cortico-world-lofter) · [问题反馈](https://github.com/suhong11300/cortico-world-lofter/issues) · [npm](https://www.npmjs.com/package/cortico-world-lofter)
+
 ## 目录
 
 - [为什么需要它](#为什么需要它)
