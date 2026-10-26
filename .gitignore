@@ -1,0 +1,5 @@
+node_modules/
+*.log
+
+# dist/ 故意不忽略:webUiClient 指向 dist/webui.js,从 git 直接装的人也要有面板产物。
+# 改了 src/webui/client.ts 就重跑 pnpm build 并一起提交。

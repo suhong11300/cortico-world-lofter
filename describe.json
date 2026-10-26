@@ -1,0 +1,276 @@
+{
+  "tools": [
+    {
+      "name": "lofter_login_status",
+      "description": "Report whether a LOFTER cookie is stored locally and which optional abilities are enabled.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "tags": [
+        "read"
+      ],
+      "summary": {
+        "zh": "报本机有没有存 LOFTER 的 Cookie,以及哪几项可选能力是打开的。",
+        "en": "Reports whether a LOFTER cookie is stored and which optional abilities are enabled."
+      }
+    },
+    {
+      "name": "lofter_login_cookie",
+      "description": "Store the LOFTER cookie header typed by the user, then probe whether it still works.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cookie": {
+            "type": "string",
+            "description": "Raw cookie header pasted from a logged-in browser; the \"Cookie:\" prefix is optional."
+          }
+        },
+        "required": [
+          "cookie"
+        ]
+      },
+      "tags": [
+        "write"
+      ],
+      "summary": {
+        "zh": "把用户粘过来的 Cookie 存到本机,并立刻探一次活。",
+        "en": "Stores the pasted cookie locally, then probes whether it still works."
+      }
+    },
+    {
+      "name": "lofter_blog_posts",
+      "description": "List posts on one LOFTER blog page.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "blog": {
+            "type": "string",
+            "description": "Blog domain, e.g. \"someone\" for someone.lofter.com."
+          },
+          "offset": {
+            "type": "number",
+            "description": "Skip this many posts; default 0."
+          },
+          "limit": {
+            "type": "number",
+            "description": "How many posts to return; capped by the world config."
+          }
+        },
+        "required": [
+          "blog"
+        ]
+      },
+      "tags": [
+        "read"
+      ],
+      "summary": {
+        "zh": "列某个博主主页上的帖子。",
+        "en": "Lists posts on one blog page."
+      }
+    },
+    {
+      "name": "lofter_tag_posts",
+      "description": "List posts under one LOFTER tag. Requires the tag-stream switch.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tag": {
+            "type": "string",
+            "description": "Tag name, e.g. 摄影."
+          },
+          "limit": {
+            "type": "number",
+            "description": "How many posts to return."
+          }
+        },
+        "required": [
+          "tag"
+        ]
+      },
+      "tags": [
+        "read"
+      ],
+      "summary": {
+        "zh": "按标签翻帖;需要先打开「允许标签流」。",
+        "en": "Lists posts under a tag; requires the tag-stream switch."
+      }
+    },
+    {
+      "name": "lofter_search",
+      "description": "Search LOFTER posts by keyword. Requires the search switch.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "keyword": {
+            "type": "string",
+            "description": "Search keyword."
+          },
+          "limit": {
+            "type": "number",
+            "description": "How many posts to return."
+          }
+        },
+        "required": [
+          "keyword"
+        ]
+      },
+      "tags": [
+        "read"
+      ],
+      "summary": {
+        "zh": "站内搜帖;需要先打开「允许站内搜索」。",
+        "en": "Searches posts; requires the search switch."
+      }
+    },
+    {
+      "name": "lofter_post",
+      "description": "Read one LOFTER post: title, body text, image links.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "postId": {
+            "type": "string",
+            "description": "Post id."
+          },
+          "blog": {
+            "type": "string",
+            "description": "Blog domain the post belongs to; improves the permalink."
+          }
+        },
+        "required": [
+          "postId"
+        ]
+      },
+      "tags": [
+        "read"
+      ],
+      "summary": {
+        "zh": "读单篇正文,连配图直链一起回。",
+        "en": "Reads one post, including image links."
+      }
+    },
+    {
+      "name": "lofter_download",
+      "description": "Download post images to the local folder. Requires the download switch.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "urls": {
+            "type": "array",
+            "description": "Image URLs, usually copied from lofter_post output.",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "urls"
+        ]
+      },
+      "tags": [
+        "write"
+      ],
+      "summary": {
+        "zh": "把配图存到本机;需要先打开「允许存图」。",
+        "en": "Downloads images locally; requires the download switch."
+      }
+    },
+    {
+      "name": "lofter_watch",
+      "description": "Manage watched blogs or tags: action add / list / remove / check.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "add",
+              "list",
+              "remove",
+              "check"
+            ],
+            "description": "What to do with the watch list."
+          },
+          "target": {
+            "type": "string",
+            "description": "Blog domain or tag name."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "blog",
+              "tag"
+            ],
+            "description": "Defaults to blog."
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "tags": [
+        "write"
+      ],
+      "summary": {
+        "zh": "管理订阅:登记要盯的博主或标签,并检查有没有新帖。",
+        "en": "Manages the watch list and checks for new posts."
+      }
+    },
+    {
+      "name": "lofter_hot_posts",
+      "description": "Fetch LOFTER hot posts; this call returns full HTML bodies together with the list.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20,
+            "description": "How many posts to return; default 10."
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Skip this many posts; default 0."
+          }
+        },
+        "required": []
+      },
+      "tags": [
+        "read"
+      ],
+      "summary": {
+        "zh": "取站内热门;这个接口一次就把列表和全文一起带回来了。",
+        "en": "Fetches hot posts; one call returns both the list and the full bodies."
+      }
+    }
+  ],
+  "events": [
+    {
+      "type": "lofter.ready",
+      "description": {
+        "zh": "World 挂载完成,附带本机登录态。",
+        "en": "The World was mounted, with the local login state."
+      }
+    }
+  ],
+  "prompts": [
+    {
+      "key": "worlds.lofter.envPrompt",
+      "title": "LOFTER 阅读 · 环境提示词",
+      "role": "envPrompt",
+      "content": "LOFTER 阅读:{{lofter.loggedIn}}{{lofter.nickname}}。已打开的能力:{{lofter.abilities | 只读单篇与博主主页}}。\n用户说要看看某篇博文、某个博主、某个标签时再去取;取回来直接在对话里讲,不要自己定时联网,也不要主动去翻。\n没登录就直说没登录,并提示去「LOFTER 阅读」面板粘一次 Cookie,别假装读过。"
+    }
+  ]
+}

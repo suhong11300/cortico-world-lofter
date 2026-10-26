@@ -1,0 +1,64 @@
+{
+  "name": "cortico-world-lofter",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "让 Coopanion 读得了 LOFTER：带登录态抓博文、标签流与单篇正文，默认只在对话里按需取，不落盘不订阅",
+  "license": "MIT",
+  "author": "苏鸿与维基 (suhong11300)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/suhong11300/cortico-world-lofter.git"
+  },
+  "homepage": "https://github.com/suhong11300/cortico-world-lofter#readme",
+  "bugs": {
+    "url": "https://github.com/suhong11300/cortico-world-lofter/issues"
+  },
+  "keywords": [
+    "cortico-world",
+    "cortico",
+    "coopanion",
+    "lofter",
+    "blog",
+    "reader",
+    "netease"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@11.28.6",
+  "main": "./src/index.ts",
+  "cortico": {
+    "kind": "world",
+    "api": 6,
+    "webUiClient": "dist/webui.js",
+    "tags": [
+      "external-setup",
+      "experimental"
+    ],
+    "describe": "describe.json"
+  },
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "describe.json"
+  ],
+  "scripts": {
+    "build": "node scripts/build-webui.mjs",
+    "prepublishOnly": "node scripts/build-webui.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "describe": "tsx scripts/describe.mts",
+    "describe:check": "tsx scripts/describe.mts --check"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "cortico": "^0.2.6",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^3.2.7"
+  }
+}
