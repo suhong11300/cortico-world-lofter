@@ -1,3 +1,11 @@
+## 0.1.1
+
+市场卡片补上配图与显示名，标签按功能重划；抓取逻辑与 0.1.0 完全一致。
+
+- **图标**：新增 `icon.svg`（光圈 + 正文行 + 右上光点），写进 `cortico.icon` 并加进 `files`。
+- **标签重划**：`external-setup` / `experimental` → `internet` + `requires-key`。读站点内容算 `internet`；必须用你自己的 LOFTER 登录态算 `requires-key`。没有上 `unofficial-api`：按词表定义，仅复用登录会话去读「用户在浏览器里本来就看得见的内容」不算。
+- **中英双名**：补 `cortico.locales.zh/en`（LOFTER 阅读 / LOFTER Reader）。
+
 ## 0.1.0
 
 首个版本：**只读**。用本机存的 Cookie 复刻站点自己的请求，把博文与配图带回对话。

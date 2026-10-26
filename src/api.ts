@@ -102,16 +102,18 @@ const DEFAULT_UA =
 const realSleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * 探活用的候选实参。
+ * 探活接口 —— 真机校准(2026-10-27)定的,不是猜的。
  *
- * 用空博主名 + 一页来探,是最轻的一次读;四种签名都排上,是因为站点没公开过
- * getPostList 到底吃几个参数 —— 探活顺手把签名试出来,后面正式调用就省一轮。
+ * 曾经用 `BlogBean.getPostList` 探活,结论是错的:这个 Bean 根本没有这个方法,
+ * 而 DWR 把「方法不存在」「实参不对」「缺会话字段」压成同一个
+ * IllegalArgumentException(139 字节),于是四种签名全被拒,面板显示成
+ * 「实参签名不匹配」—— 误导。
+ *
+ * 换成校准里实测能出数的两个接口,零参那个排在前面(参数没有任何可错的空间)。
  */
-const PROBE_VARIANTS: DwrVariant[] = [
-  { label: 'blog,offset,limit', params: ['', 0, 1] },
-  { label: 'blog,offset', params: ['', 0] },
-  { label: 'blog,limit', params: ['', 1] },
-  { label: 'blog', params: [''] },
+const PROBE_CALLS: DwrCall[] = [
+  { bean: 'TagBean', method: 'getRandomRTPostList', variants: [{ label: '零参', params: [] }] },
+  { bean: 'PostBean', method: 'getHotPosts', variants: [{ label: 'offset,limit', params: [0, 1] }] },
 ];
 
 export class LofterApi {
@@ -382,22 +384,38 @@ export class LofterApi {
    * 只关心「通不通」,不解释业务错误 —— 上层据此显示已登录/过期。
    */
   async probe(): Promise<{ ok: boolean; message: string }> {
-    try {
-      // 探活不只看通不通,还顺手把实参签名试出来:命中后同进程内的正式调用就不用再试。
-      await this.callAdaptive(
-        'BlogBean',
-        'getPostList',
-        PROBE_VARIANTS,
-      );
-      return { ok: true, message: 'Cookie 可用。' };
-    } catch (error) {
-      if (error instanceof LofterAuthError) return { ok: false, message: error.message };
-      if (error instanceof LofterUpstreamError) return { ok: false, message: error.message };
-      if (error instanceof LofterSignatureError) {
-        return { ok: false, message: 'Bean 名是对的,但这几组实参签名都被拒了 —— 站点可能换了方法签名。' + error.message };
+    // 判据只有一条:拿到非空的 DWR 响应 = Cookie 有效。
+    // 未登录时本站回 200 + 空体(不是 401/403),由 callText 抛 LofterAuthError。
+    const failures: string[] = [];
+    for (const call of PROBE_CALLS) {
+      try {
+        const values = await this.callAdaptiveValues(call.bean, call.method, call.variants);
+        const objects = values.filter((v) => v !== null && typeof v === 'object');
+        const arrays = objects.filter((v) => Array.isArray(v)) as unknown[][];
+        const rows = arrays.reduce((max, a) => Math.max(max, a.length), objects.length);
+        return {
+          ok: true,
+          message: rows > 0 ? 'Cookie 可用,探活读到 ' + rows + ' 条数据。' : 'Cookie 可用。',
+        };
+      } catch (error) {
+        if (error instanceof LofterAuthError) return { ok: false, message: error.message };
+        const label = call.bean + '.' + call.method;
+        if (error instanceof LofterSignatureError) {
+          failures.push(label + '(' + error.message + ')');
+          continue;
+        }
+        if (error instanceof LofterUpstreamError) {
+          failures.push(label + ':' + error.message);
+          continue;
+        }
+        failures.push(label + ':' + (error instanceof Error ? error.message : String(error)));
       }
-      return { ok: false, message: '探活失败:' + (error instanceof Error ? error.message : String(error)) };
     }
+    const detail = failures.join(' / ');
+    return {
+      ok: false,
+      message: '探活的两个接口都被拒了 —— 站点可能改版,移动 DWR 层换了方法名。这不代表 Cookie 坏了,可以直接让模型读一篇已知链接验证。详情:' + detail,
+    };
   }
 }
 

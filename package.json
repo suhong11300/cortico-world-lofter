@@ -1,6 +1,6 @@
 {
   "name": "cortico-world-lofter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "让 Coopanion 读得了 LOFTER：带登录态抓博文、标签流与单篇正文，默认只在对话里按需取，不落盘不订阅",
   "license": "MIT",
@@ -32,13 +32,26 @@
     "api": 6,
     "webUiClient": "dist/webui.js",
     "tags": [
-      "external-setup",
-      "experimental"
+      "internet",
+      "requires-key"
     ],
-    "describe": "describe.json"
+    "describe": "describe.json",
+    "displayName": "LOFTER 阅读",
+    "icon": "icon.svg",
+    "locales": {
+      "zh": {
+        "displayName": "LOFTER 阅读",
+        "description": "带自己的登录态读 LOFTER:热榜、单篇正文与配图,按需取用不落盘,读不到会直说。"
+      },
+      "en": {
+        "displayName": "LOFTER Reader",
+        "description": "Reads LOFTER with your own login: hot posts, single articles and images, fetched on demand and never archived behind your back."
+      }
+    }
   },
   "files": [
     "src",
+    "icon.svg",
     "dist",
     "README.md",
     "CHANGELOG.md",

@@ -130,14 +130,41 @@ describe('callAdaptive', () => {
 });
 
 describe('probe', () => {
-  it('探活成功时把命中的签名记下来', async () => {
-    const { api } = makeApi([IAE, OK]);
+  it('零参接口通就算可用,并记住命中的签名', async () => {
+    const { api } = makeApi([OK]);
     const result = await api.probe();
     expect(result.ok).toBe(true);
-    expect(Object.keys(api.knownSignatures())).toEqual(['BlogBean.getPostList']);
+    expect(Object.keys(api.knownSignatures())).toEqual(['TagBean.getRandomRTPostList']);
   });
 
-  it('探活遇到 Bean 名问题时不谎报成功', async () => {
+  it('零参接口被拒时回退到热榜接口', async () => {
+    // 站点哪天把 getRandomRTPostList 删了,靠第二候选仍然判得出可用
+    const { api, bodies } = makeApi([IAE, OK]);
+    const result = await api.probe();
+    expect(result.ok).toBe(true);
+    expect(Object.keys(api.knownSignatures())).toEqual(['PostBean.getHotPosts']);
+    expect(bodies).toHaveLength(2);
+    expect(bodies[0]).toContain('c0-scriptName=TagBean');
+    expect(bodies[1]).toContain('c0-scriptName=PostBean');
+  });
+
+  it('两个接口都被拒时报站点改版,不谎称 Cookie 坏了', async () => {
+    const { api, bodies } = makeApi([IAE]);
+    const result = await api.probe();
+    expect(result.ok).toBe(false);
+    expect(result.message).toContain('站点可能改版');
+    expect(result.message).not.toContain('Cookie 可用');
+    expect(bodies.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('未登录(空响应体)直接判死,不再白试第二个接口', async () => {
+    const { api, bodies } = makeApi(['', OK]);
+    const result = await api.probe();
+    expect(result.ok).toBe(false);
+    expect(bodies).toHaveLength(1);
+  });
+
+  it('Bean 名不存在时不谎报成功', async () => {
     const { api } = makeApi([NO_CLASS]);
     const result = await api.probe();
     expect(result.ok).toBe(false);
