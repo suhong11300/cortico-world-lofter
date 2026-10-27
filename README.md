@@ -1,4 +1,9 @@
-# 🐉 cortico-world-lofter
+# LOFTER 阅读 · cortico-world-lofter
+
+[![npm](https://img.shields.io/npm/v/cortico-world-lofter?label=npm&color=cb3837)](https://www.npmjs.com/package/cortico-world-lofter)
+[![license](https://img.shields.io/npm/l/cortico-world-lofter?color=blue)](./LICENSE)
+[![node](https://img.shields.io/badge/node-%E2%89%A5%2022-43853d)](https://nodejs.org)
+[![world api](https://img.shields.io/badge/cortico%20world%20api-6-8b5cf6)](https://github.com/Pal-AI-Lab/cortico)
 
 给 Coopanion 接上 LOFTER 的**阅读**能力。
 
@@ -11,7 +16,7 @@
 > 正文真正的数据通道是站点自己的 DWR 端点 `/dwr/mobile/call/plaincall/<Bean>.<method>.dwr` —— **未登录时它回 200 + 空响应体**。
 > 所以这个插件只做一件事：用你浏览器里的那份 Cookie，复刻同一个请求。
 
-*Cortico World · `kind: world` · `api: 6` · `tags: external-setup / experimental` · MIT · 静态与单测已过、宿主内交互未复测*
+*Cortico World · `kind: world` · `api: 6` · `tags: internet / requires-key` · MIT · 141 项单测通过、契约校验通过*
 
 [源码](https://github.com/suhong11300/cortico-world-lofter) · [问题反馈](https://github.com/suhong11300/cortico-world-lofter/issues) · [npm](https://www.npmjs.com/package/cortico-world-lofter)
 

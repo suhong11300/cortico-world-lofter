@@ -1,6 +1,6 @@
 {
   "name": "cortico-world-lofter",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "description": "以自有登录态读取 LOFTER 内容。支持热榜、单篇正文与配图；按需取用，不落盘、不订阅；失败时明确报错。",
   "license": "MIT",
@@ -20,7 +20,9 @@
     "lofter",
     "blog",
     "reader",
-    "netease"
+    "netease",
+    "blog-reader",
+    "cookie-session"
   ],
   "engines": {
     "node": ">=22"
